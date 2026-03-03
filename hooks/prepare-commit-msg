@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Ghost prepare-commit-msg hook
+# Installed by ghost init — do not remove this line
+# $1 = commit message file, $2 = source (message|template|merge|squash|commit)
+# Ghost only enriches manual ghost commits; skip all other cases
+[ "${2:-}" = "message" ] || exit 0
+[ "${GHOST_ENRICHING:-0}" = "1" ] || exit 0
+exit 0

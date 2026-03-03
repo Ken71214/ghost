@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# ghost — intent-based git commits powered by Claude
+set -euo pipefail
+
+GHOST_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export GHOST_ROOT
+
+# shellcheck source=lib/ghost-common.sh
+source "${GHOST_ROOT}/lib/ghost-common.sh"
+
+usage() {
+  cat <<'EOF'
+ghost — commit intentions, not code
+
+Usage:
+  ghost init                        initialize repo for ghost
+  ghost commit -m "intent"          generate code from intent and commit
+  ghost commit --dry-run -m "intent" generate code, show changes, no commit
+  ghost log                         pretty-print ghost commit history
+
+Options:
+  --model MODEL    claude model to use (default: claude-sonnet-4-6)
+  --dry-run        generate code but do not commit
+  -m, --message    the intent/prompt to pass to claude
+
+Environment:
+  GHOST_SKIP=1     pass-through to plain git commit
+  GHOST_MODEL      default model override
+
+EOF
+}
+
+if [ $# -eq 0 ]; then
+  usage
+  exit 1
+fi
+
+SUBCOMMAND="$1"
+shift
+
+case "$SUBCOMMAND" in
+  init)
+    source "${GHOST_ROOT}/lib/ghost-init.sh"
+    cmd_init "$@"
+    ;;
+  commit)
+    # If GHOST_SKIP is set, pass through to git commit
+    if ghost_is_skip; then
+      exec git commit "$@"
+    fi
+    source "${GHOST_ROOT}/lib/ghost-commit.sh"
+    cmd_commit "$@"
+    ;;
+  log)
+    source "${GHOST_ROOT}/lib/ghost-log.sh"
+    cmd_log "$@"
+    ;;
+  help|--help|-h)
+    usage
+    ;;
+  *)
+    echo "error: unknown subcommand: ${SUBCOMMAND}" >&2
+    echo "Run 'ghost help' for usage." >&2
+    exit 1
+    ;;
+esac
