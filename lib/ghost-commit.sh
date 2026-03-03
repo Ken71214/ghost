@@ -42,6 +42,7 @@ _changed_files() {
 
 cmd_commit() {
   ghost_ensure_repo
+  ghost_init_colors
 
   local prompt=""
   local agent="${GHOST_DEFAULT_AGENT}"
@@ -70,21 +71,21 @@ cmd_commit() {
         shift
         ;;
       *)
-        echo "error: unknown option: $1" >&2
-        echo "usage: ghost commit -m \"prompt\" [--agent AGENT] [--model MODEL] [--dry-run]" >&2
+        gh_error "error: unknown option: $1"
+        gh_error "usage: ghost commit -m \"prompt\" [--agent AGENT] [--model MODEL] [--dry-run]"
         exit 1
         ;;
     esac
   done
 
   if [ -z "$prompt" ]; then
-    echo "error: prompt required. Use -m \"your intent here\"" >&2
+    gh_error "error: prompt required. Use -m \"your intent here\""
     exit 1
   fi
 
   if ! ghost_validate_agent "$agent"; then
-    echo "error: unsupported agent: ${agent}" >&2
-    echo "  supported: ${GHOST_SUPPORTED_AGENTS[*]}" >&2
+    gh_error "error: unsupported agent: ${agent}"
+    gh_error "  supported: ${GHOST_SUPPORTED_AGENTS[*]}"
     exit 1
   fi
 
@@ -93,11 +94,13 @@ cmd_commit() {
     model="$(ghost_default_model "$agent")"
   fi
 
-  echo "Ghost: running ${agent}..."
-  echo "  prompt: ${prompt}"
-  [ -n "$model" ] && echo "  model:  ${model}"
-  [ "$dry_run" = "1" ] && echo "  mode:   dry-run"
-  echo ""
+  # ── Header ────────────────────────────────────────────────────────────────
+  printf "\n%b  ▸ ghost%b\n" "${GH_PINK}${GH_BOLD}" "${GH_RESET}"
+  gh_kv "agent"  "${agent}"
+  [ -n "$model" ] && gh_kv "model" "${model}"
+  gh_kv "intent" "${prompt}"
+  [ "$dry_run" = "1" ] && gh_kv "mode" "dry-run"
+  printf "\n"
 
   # Snapshot before
   local snapshot_before
@@ -106,14 +109,20 @@ cmd_commit() {
   local session_id
   session_id="$(uuidgen | tr '[:upper:]' '[:lower:]')"
 
+  # ── Run agent (spinner in background while it works) ──────────────────────
+  ghost_spinner_start "running ${agent}…"
   local agent_exit=0
   ghost_run_agent "$agent" "$model" "$prompt" || agent_exit=$?
+  ghost_spinner_stop
 
   if [ "$agent_exit" -ne 0 ]; then
-    echo "" >&2
-    echo "error: ${agent} exited with code ${agent_exit}" >&2
+    printf "\n" >&2
+    gh_error "error: ${agent} exited with code ${agent_exit}"
     exit "$agent_exit"
   fi
+
+  # ── Post-process ──────────────────────────────────────────────────────────
+  ghost_spinner_start "detecting changes…"
 
   # Snapshot after
   local snapshot_after
@@ -123,19 +132,22 @@ cmd_commit() {
   local changed_files
   changed_files="$(_changed_files "$snapshot_before" "$snapshot_after")"
 
+  ghost_spinner_stop
+
   if [ -z "$changed_files" ]; then
-    echo ""
-    echo "Ghost: no file changes detected. Nothing to commit."
+    printf "\n"
+    gh_label "  ghost: no file changes detected. Nothing to commit."
     exit 1
   fi
 
-  echo ""
-  echo "Ghost: detected changes:"
-  echo "$changed_files" | sed 's/^/  /'
+  printf "\n%bchanges:%b\n" "${GH_PURPLE}" "${GH_RESET}"
+  while IFS= read -r f; do
+    printf "  %b+%b %s\n" "${GH_CYAN}" "${GH_RESET}" "$f"
+  done <<< "$changed_files"
 
   if [ "$dry_run" = "1" ]; then
-    echo ""
-    echo "Ghost: dry-run complete. No commit made."
+    printf "\n"
+    gh_label "  ghost: dry-run complete. No commit made."
     exit 0
   fi
 
@@ -162,6 +174,7 @@ ${GHOST_FILES_KEY}: ${files_csv}"
   # Commit
   GHOST_ENRICHING=1 git commit -m "$commit_msg"
 
-  echo ""
-  echo "Ghost: committed '${prompt}'"
+  printf "\n"
+  gh_success "  ✓ ghost: committed '${prompt}'"
+  printf "\n"
 }

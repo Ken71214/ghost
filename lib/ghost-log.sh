@@ -6,18 +6,34 @@ set -euo pipefail
 # shellcheck source=lib/ghost-common.sh
 source "${GHOST_ROOT}/lib/ghost-common.sh"
 
-# Colors
-_RESET='\033[0m'
-_BOLD='\033[1m'
-_YELLOW='\033[0;33m'
-_CYAN='\033[0;36m'
-_GREEN='\033[0;32m'
-_DIM='\033[2m'
-
 cmd_log() {
   ghost_ensure_repo
+  ghost_init_colors
 
   local count=0
+  local max_count=""
+
+  # Parse flags
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -n)
+        shift
+        max_count="${1:?"-n requires a number"}"
+        shift
+        ;;
+      -n*)
+        max_count="${1#-n}"
+        shift
+        ;;
+      *)
+        echo "error: unknown option: $1" >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  local git_log_args=("--format=%H")
+  [[ -n "$max_count" ]] && git_log_args+=("--max-count=$max_count")
 
   while IFS= read -r hash; do
     local body
@@ -31,28 +47,36 @@ cmd_log() {
 
     date="$(git log -1 --format='%ad' --date=short "$hash")"
     author="$(git log -1 --format='%an' "$hash")"
-    prompt="$(echo "$body" | grep "^${GHOST_PROMPT_KEY}:" | sed "s/^${GHOST_PROMPT_KEY}: //")"
-    agent="$(echo "$body" | grep "^${GHOST_AGENT_KEY}:" | sed "s/^${GHOST_AGENT_KEY}: //")"
-    model="$(echo "$body" | grep "^${GHOST_MODEL_KEY}:" | sed "s/^${GHOST_MODEL_KEY}: //")"
-    session="$(echo "$body" | grep "^${GHOST_SESSION_KEY}:" | sed "s/^${GHOST_SESSION_KEY}: //")"
-    files="$(echo "$body" | grep "^${GHOST_FILES_KEY}:" | sed "s/^${GHOST_FILES_KEY}: //")"
+    prompt="$(echo "$body" | grep "^${GHOST_PROMPT_KEY}:" | sed "s/^${GHOST_PROMPT_KEY}: //" || true)"
+    agent="$(echo "$body" | grep "^${GHOST_AGENT_KEY}:" | sed "s/^${GHOST_AGENT_KEY}: //" || true)"
+    model="$(echo "$body" | grep "^${GHOST_MODEL_KEY}:" | sed "s/^${GHOST_MODEL_KEY}: //" || true)"
+    session="$(echo "$body" | grep "^${GHOST_SESSION_KEY}:" | sed "s/^${GHOST_SESSION_KEY}: //" || true)"
+    files="$(echo "$body" | grep "^${GHOST_FILES_KEY}:" | sed "s/^${GHOST_FILES_KEY}: //" || true)"
 
-    [ "$count" -gt 0 ] && echo ""
+    [ "$count" -gt 0 ] && printf "\n"
 
-    printf "${_BOLD}${_YELLOW}%s${_RESET} ${_DIM}%s (%s)${_RESET}\n" \
-      "$short_hash" "$date" "$author"
-    printf "  ${_CYAN}intent:${_RESET}  %s\n" "$prompt"
-    printf "  ${_DIM}agent:   %s${_RESET}\n" "${agent:-claude}"
-    printf "  ${_DIM}model:   %s${_RESET}\n" "${model:-unknown}"
-    printf "  ${_DIM}session: %s${_RESET}\n" "${session:-unknown}"
+    # hash + date + author
+    printf "%b%s%b %b%s%b %b(%s)%b\n" \
+      "${GH_PINK}${GH_BOLD}" "$short_hash" "${GH_RESET}" \
+      "${GH_BLUE}"           "$date"       "${GH_RESET}" \
+      "${GH_DIM}"            "$author"     "${GH_RESET}"
+
+    # intent
+    printf "  %bintent%b   %s\n" "${GH_PURPLE}" "${GH_RESET}" "$prompt"
+
+    # agent / model / session
+    printf "  %bagent%b    %b%s%b\n"   "${GH_DIM}" "${GH_RESET}" "${GH_CYAN}" "${agent:-claude}"   "${GH_RESET}"
+    printf "  %bmodel%b    %b%s%b\n"   "${GH_DIM}" "${GH_RESET}" "${GH_CYAN}" "${model:-unknown}"  "${GH_RESET}"
+    printf "  %bsession%b  %b%s%b\n"   "${GH_DIM}" "${GH_RESET}" "${GH_DIM}"  "${session:-unknown}" "${GH_RESET}"
+
     if [ -n "$files" ]; then
-      printf "  ${_GREEN}files:   %s${_RESET}\n" "$files"
+      printf "  %bfiles%b    %b%s%b\n" "${GH_DIM}" "${GH_RESET}" "${GH_GREEN}" "$files" "${GH_RESET}"
     fi
 
     count=$((count + 1))
-  done < <(git log --format="%H" 2>/dev/null || true)
+  done < <(git log "${git_log_args[@]}" 2>/dev/null || true)
 
   if [ "$count" -eq 0 ]; then
-    echo "No ghost commits found."
+    gh_dim "No ghost commits found."
   fi
 }

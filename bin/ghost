@@ -16,7 +16,7 @@ Usage:
   ghost init                        initialize repo for ghost
   ghost commit -m "intent"          generate code from intent and commit
   ghost commit --dry-run -m "intent" generate code, show changes, no commit
-  ghost log                         pretty-print ghost commit history
+  ghost log [-n <count>]            pretty-print ghost commit history
 
 Options:
   --agent AGENT    coding agent to use (default: claude)
